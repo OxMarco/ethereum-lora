@@ -89,13 +89,14 @@ def main():
                     buffer = ""
                     
                     try:
-                        print("Responding...")
+                        print("Sending to node...")
                         response = send_to_node(value)
-                        print(json.dumps(response, indent=4))
+                        print("Response: ", json.dumps(response, indent=4).replace("'", '"'))
+                        #print("Responding...")
                         #code = lora.send_transparent_message(response)
                         #if code != 1:
                         #    print("Error!")
-                        print("OK")
+                        #print("OK")
                     except Exception as e:
                         print(json.dumps({"success": False, "error": f"An unexpected error occurred: {e}"}, indent=4))
                         continue

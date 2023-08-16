@@ -74,7 +74,7 @@ def main():
         if lora.available() > 0:
 
             try:
-                code, value, rssi = lora.receive_dict(rssi=True)
+                code, value, rssi = lora.receive_message(rssi=True)
                 print("Received a new message")
                 print(value)
                 print("RSSI", rssi)
@@ -82,7 +82,7 @@ def main():
                 print("Responding...")
                 response = send_to_geth(value)
                 print(json.dumps(response, indent=4))
-                code = lora.send_transparent_dict(response)
+                code = lora.send_transparent_message(response)
                 if code != 1:
                     print("Error!")
                 print("OK")

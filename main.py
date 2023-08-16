@@ -17,7 +17,7 @@ def test_connection():
         "params": [],
         "id": 1,
     }
-    response = send_to_geth(payload)
+    response = send_to_geth(json.dumps(payload))
     if response["success"]:
         print("\nConnection successful!")
         print("Client Version:", response["data"]["result"])
@@ -33,7 +33,7 @@ def send_to_geth(data):
     headers = {'Content-type': 'application/json'}
 
     try:
-        response = requests.post(url, json=data, headers=headers)
+        response = requests.post(url, data=data, headers=headers)
         response.raise_for_status()
 
         return {"success": True, "data": response.json()}
@@ -84,7 +84,8 @@ def main():
                 print(json.dumps(response, indent=4))
                 code = lora.send_transparent_dict(response)
                 if code != 1:
-                    print("Send message error!")
+                    print("Error!")
+                print("OK")
             except Exception as e:
                 print(json.dumps({"success": False, "error": f"An unexpected error occurred: {e}"}, indent=4))
                 continue

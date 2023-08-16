@@ -1,4 +1,5 @@
 import os
+import json
 import serial
 
 from lora.lora_e22 import LoRaE22, Configuration
@@ -30,15 +31,17 @@ def main():
         return
     print("OK")
 
+    print("Sending message...")
     payload = {
         "jsonrpc": "2.0",
         "method": "eth_getBalance",
         "params": ["0x0000000000000000000000000000000000000000", "latest"],
         "id": 1
     }
-    code = lora.send_transparent_dict(payload)
+    code = lora.send_transparent_message(json.dumps(payload))
     if code != 1:
-        print("Send message error!")
+        print("Error!")
+    print("OK")
 
 
 if __name__ == "__main__":

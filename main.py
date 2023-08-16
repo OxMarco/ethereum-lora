@@ -32,7 +32,6 @@ def test_connection():
 def send_to_node(data):
     url = os.environ.get('NODE_URL', 'http://127.0.0.1:8545')
     headers = {'Content-type': 'application/json'}
-
     response = requests.post(url, data=data, headers=headers)
     response.raise_for_status()
 
@@ -91,7 +90,7 @@ def main():
                     
                     try:
                         print("Sending to node...")
-                        response = send_to_node(value)
+                        response = send_to_node(data)
                         print("Response: ", json.dumps(response, indent=4))
                         #print("Responding...")
                         #code = lora.send_transparent_message(response)

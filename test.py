@@ -32,11 +32,13 @@ def main():
 
     payload = {
         "jsonrpc": "2.0",
-        "method": "web3_clientVersion",
-        "params": [],
+        "method": "eth_getBalance",
+        "params": ["0x0000000000000000000000000000000000000000", "latest"],
         "id": 1
     }
     code = lora.send_transparent_dict(payload)
+    if code != 1:
+        print("Send message error!")
 
 
 if __name__ == "__main__":

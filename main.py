@@ -41,10 +41,6 @@ def send_to_geth(data):
         return {"success": False, "error": str(e)}
 
 
-def print_to_console(message):
-    print(message)
-
-
 def main():
     test_connection()
 
@@ -79,16 +75,18 @@ def main():
 
             try:
                 code, value, rssi = lora.receive_dict(rssi=True)
-                print('Received a new message with RSSI: ', rssi)
-
-                print(ResponseStatusCode.get_description(code))
-
+                print("Received a new message")
                 print(value)
+                print("RSSI", rssi)
 
+                print("Responding...")
                 response = send_to_geth(value)
-                print_to_console(json.dumps(response, indent=4))
+                print(json.dumps(response, indent=4))
+                code = lora.send_transparent_dict(response)
+                if code != 1:
+                    print("Send message error!")
             except Exception as e:
-                print_to_console(json.dumps({"success": False, "error": f"An unexpected error occurred: {e}"}, indent=4))
+                print(json.dumps({"success": False, "error": f"An unexpected error occurred: {e}"}, indent=4))
                 continue
 
 

@@ -2,6 +2,7 @@ import json
 import requests
 import os
 import serial
+import time
 
 from lora.lora_e22 import LoRaE22, Configuration
 from lora.lora_e22_operation_constant import ResponseStatusCode
@@ -85,8 +86,11 @@ def main():
                 except Exception as e:
                     print(json.dumps({"success": False, "error": f"An unexpected error occurred: {e}"}, indent=4))
                     continue
+                finally:
+                    time.sleep(2)
     except requests.exceptions.RequestException as e:
         print(f"Connection error: {e}")
+        return
 
 
 if __name__ == "__main__":

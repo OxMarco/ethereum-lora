@@ -85,13 +85,14 @@ def main():
                 # Check if buffer has a complete JSON message
                 try:
                     data = json.loads(buffer)
+                    data = json.dumps(data).replace("'", '"')
                     print("message:", data)
                     buffer = ""
                     
                     try:
                         print("Sending to node...")
                         response = send_to_node(value)
-                        print("Response: ", json.dumps(response, indent=4).replace("'", '"'))
+                        print("Response: ", json.dumps(response, indent=4))
                         #print("Responding...")
                         #code = lora.send_transparent_message(response)
                         #if code != 1:

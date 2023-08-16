@@ -32,12 +32,7 @@ def main():
     print("OK")
 
     print("Sending message...")
-    payload = {
-        "jsonrpc": "2.0",
-        "method": "eth_getBalance",
-        "params": ["0x0000000000000000000000000000000000000000", "latest"],
-        "id": 1
-    }
+    payload = {"jsonrpc": "2.0", "method": "eth_getBalance", "params": ["0x0000000000000000000000000000000000000000","latest"], "id": 1}
     code = lora.send_transparent_message(json.dumps(payload))
     if code != 1:
         print("Error!")

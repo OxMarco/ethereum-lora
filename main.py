@@ -68,26 +68,42 @@ def main():
 
         print("Listener started...")
         print("\n------------------\n")
+        
+        buffer = ""
+        
         while True:
             if lora.available() > 0:
-                try:
-                    code, value, rssi = lora.receive_message(rssi=True)
-                    print("Received a new message")
-                    print(value)
-                    print("RSSI", rssi)
-
-                    print("Responding...")
-                    response = send_to_node(value)
-                    print(json.dumps(response, indent=4))
-                    #code = lora.send_transparent_message(response)
-                    #if code != 1:
-                    #    print("Error!")
-                    print("OK")
-                except Exception as e:
-                    print(json.dumps({"success": False, "error": f"An unexpected error occurred: {e}"}, indent=4))
+                code, value, rssi = lora.receive_message(rssi=True)
+                print("Received a new message")
+                if code != 1:
+                    print("Error!")
                     continue
-                finally:
-                    time.sleep(2)
+                
+                print("RSSI", rssi)
+                buffer += value
+    
+                # Check if buffer has a complete JSON message
+                try:
+                    data = json.loads(buffer)
+                    print("message:", data)
+                    buffer = ""
+                    
+                    try:
+                        print("Responding...")
+                        response = send_to_node(value)
+                        print(json.dumps(response, indent=4))
+                        #code = lora.send_transparent_message(response)
+                        #if code != 1:
+                        #    print("Error!")
+                        print("OK")
+                    except Exception as e:
+                        print(json.dumps({"success": False, "error": f"An unexpected error occurred: {e}"}, indent=4))
+                        continue
+                    finally:
+                        time.sleep(2)
+                except json.JSONDecodeError:
+                    # Not a complete JSON message, keep reading
+                    continue
     except requests.exceptions.RequestException as e:
         print(f"Connection error: {e}")
         return

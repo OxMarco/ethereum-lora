@@ -25,7 +25,15 @@ def main():
     
     configure(lora, lora_chip_model, client_address)
 
+    waiting = False
+
     while True:
+        while waiting:
+            if lora.available() > 0:
+                code, msg, rssi = lora.receive_message(rssi=True, delimiter=b'\n')
+                print("Received a new message")
+                waiting = False
+
         # Prompt the user to enter JSON payload
         payload = input("\nPlease enter the JSON payload (or 'exit' to quit): ")
 
@@ -41,6 +49,7 @@ def main():
             if code != 1:
                 print("Error!")
             print("OK")
+            waiting = True
 
         except json.JSONDecodeError:
             print("Invalid JSON input, retry")

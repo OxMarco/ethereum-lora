@@ -8,7 +8,7 @@ from lora.lora_e22 import LoRaE22, Configuration
 from lora.lora_e22_operation_constant import ResponseStatusCode
 from lora.lora_e22_constants import FixedTransmission, RssiEnableByte
 
-from configure import configure, server_address
+from configure import configure, server_address, client_address, channel
 
 def test_connection():
     print("Testing connection to the node...", end='', flush=True)
@@ -30,16 +30,11 @@ def test_connection():
 
 
 def send_to_node(data):
-    try:
-        url = os.environ.get('NODE_URL', 'http://127.0.0.1:8545')
-        headers = {'Content-type': 'application/json'}
-        response = requests.post(url, data=data, headers=headers)
-        response.raise_for_status()
+    url = os.environ.get('NODE_URL', 'http://127.0.0.1:8545')
+    headers = {'Content-type': 'application/json'}
+    response = requests.post(url, data=data, headers=headers)
 
-        return response.json()
-    except Exception as e:
-        print(f"An unexpected error occurred: {e}")
-        return ""
+    return response.json()
 
 
 def main():
@@ -87,12 +82,13 @@ def main():
                     try:
                         print("Sending to node...")
                         response = send_to_node(msg)
-                        print("Response: ", json.dumps(response, indent=4))
-                        #print("Responding...")
-                        #code = lora.send_transparent_message(response)
-                        #if code != 1:
-                        #    print("Error!")
-                        #print("OK")
+                        data = json.dumps(response, indent=4)
+                        print("Response: ", data)
+                        print("Responding...")
+                        code = lora.send_fixed_message(0, client_address, channel, data+'\n')
+                        if code != 1:
+                            print("Error!")
+                        print("OK")
                     except Exception as e:
                         print(f"An unexpected error occurred: {e}")
                         continue

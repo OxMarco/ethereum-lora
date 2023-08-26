@@ -20,7 +20,7 @@ def test_connection():
         "params": [],
         "id": 1,
     }
-    response = send_to_node(json.dumps(payload), separators=(',', ':'))
+    response = send_to_node(json.dumps(payload, separators=(',', ':')))
     if response != "":
         print("\nConnection successful!")
         print("Client Version:", response["result"])

@@ -6,6 +6,8 @@ from lora.lora_e22 import LoRaE22, Configuration
 from lora.lora_e22_operation_constant import ResponseStatusCode
 from lora.lora_e22_constants import FixedTransmission, RssiEnableByte
 
+from configure import configure, client_address
+
 def main():
     lora_chip_model = os.environ.get('LORA_CHIP_MODEL', '400T33D')
     serial_port = os.environ.get('SERIAL_PORT', '/dev/serial0')
@@ -21,6 +23,8 @@ def main():
         print("LoRa interfacing error!")
         return
     
+    configure(lora, lora_chip_model, client_address)
+    
     configuration_to_set = Configuration(lora_chip_model)
     # To enable RSSI, you must also enable RSSI on receiver
     configuration_to_set.TRANSMISSION_MODE.enableRSSI = RssiEnableByte.RSSI_ENABLED
@@ -33,7 +37,7 @@ def main():
 
     print("Sending message...")
     payload = {"jsonrpc": "2.0", "method": "eth_getBalance", "params": ["0x8D97689C9818892B700e27F316cc3E41e17fBeb9","latest"], "id": 1}
-    code = lora.send_transparent_message(json.dumps(payload))
+    code = lora.send_fixed_message(0, 0x01, 23, json.dumps(payload)+'\n')
     if code != 1:
         print("Error!")
     print("OK")

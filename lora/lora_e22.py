@@ -391,7 +391,6 @@ class LoRaE22:
         self.uart.reset_output_buffer()
 
         GPIO.setmode(self.gpio_mode)
-        GPIO.setwarnings(False)
 
         if self.aux_pin is not None:
             GPIO.setup(self.aux_pin, GPIO.IN)
@@ -666,8 +665,11 @@ class LoRaE22:
         if data is None or len(data) == 0:
             return (ResponseStatusCode.ERR_E22_DATA_SIZE_NOT_MATCH, None, None) \
                 if rssi else (ResponseStatusCode.ERR_E22_DATA_SIZE_NOT_MATCH, None)
+        try:
+            data = data.decode('utf-8')
+        except UnicodeDecodeError:
+            data = data[1:].decode('utf-8')
 
-        data = data.decode('utf-8')
         msg = data
 
         return (code, msg, rssi_value) if rssi else (code, msg)
@@ -675,13 +677,13 @@ class LoRaE22:
     def clean_UART_buffer(self):
         self.uart.read_all()
 
-    def _read_until(self, terminator='\n') -> bytes:
+    def _read_until(self, terminator=b'\n') -> bytes:
         line = b''
         while True:
             c = self.uart.read(1)
+            line += c
             if c == terminator:
                 break
-            line += c
         return line
 
     def send_broadcast_message(self, CHAN, message) -> ResponseStatusCode:

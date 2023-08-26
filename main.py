@@ -8,6 +8,7 @@ from lora.lora_e22 import LoRaE22, Configuration
 from lora.lora_e22_operation_constant import ResponseStatusCode
 from lora.lora_e22_constants import FixedTransmission, RssiEnableByte
 
+from configure import configure, server_address
 
 def test_connection():
     print("Testing connection to the node...", end='', flush=True)
@@ -56,9 +57,7 @@ def main():
             print("LoRa interfacing error!")
             return
 
-        configuration_to_set = Configuration(lora_chip_model)
-        configuration_to_set.TRANSMISSION_MODE.enableRSSI = RssiEnableByte.RSSI_ENABLED
-        code, conf_setted = lora.set_configuration(configuration_to_set)
+        configure(lora, lora_chip_model, server_address)
 
         if code != 1:
             print("LoRa setup error!")
@@ -67,26 +66,20 @@ def main():
 
         print("Listener started...")
         print("\n------------------\n")
-        
-        buffer = ""
-        
+                
         while True:
             if lora.available() > 0:
-                code, value, rssi = lora.receive_message(rssi=True)
+                code, value, rssi = lora.receive_message(rssi=False, delimiter=b'\n')
                 print("Received a new message")
                 if code != 1:
                     print("Error!")
                     continue
                 
                 print("RSSI", rssi)
-                buffer += value
-    
-                # Check if buffer has a complete JSON message
                 try:
-                    data = json.loads(buffer)
+                    data = json.loads(value.strip())
                     data = json.dumps(data).replace("'", '"')
                     print("message:", data)
-                    buffer = ""
                     
                     try:
                         print("Sending to node...")
@@ -102,8 +95,10 @@ def main():
                         continue
                     finally:
                         time.sleep(2)
-                except json.JSONDecodeError:
+                except json.JSONDecodeError as e:
                     # Not a complete JSON message, keep reading
+                    print("Invalid JSON message received")
+                    print(e)
                     continue
     except requests.exceptions.RequestException as e:
         print(f"Connection error: {e}")

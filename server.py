@@ -25,7 +25,7 @@ def main():
                 response = node.send(msg)
                 data = json.dumps(response, separators=(',', ':'))
                 logging.info(f"Data: {data}")
-                lora_controller.send_message(data)
+                lora_controller.send_message(data, 0x01)
             except Exception as e:
                 logging.error(f"An unexpected error occurred: {e}")
             finally:

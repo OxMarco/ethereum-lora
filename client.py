@@ -34,7 +34,7 @@ def main():
         payload = get_user_payload()
         if payload:
             try:
-                lora_controller.send_message(payload)
+                lora_controller.send_message(payload, 0x00)
                 waiting = True
             except Exception as e:
                 logging.error(f"An unexpected error occurred: {e}")

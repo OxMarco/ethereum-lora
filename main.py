@@ -69,7 +69,7 @@ def main():
                 
         while True:
             if lora.available() > 0:
-                code, value, rssi = lora.receive_message(rssi=False, delimiter=b'\n')
+                code, value, rssi = lora.receive_message(rssi=True, delimiter=b'\n')
                 print("Received a new message")
                 if code != 1:
                     print("Error!")

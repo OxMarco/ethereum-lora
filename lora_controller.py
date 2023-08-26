@@ -51,7 +51,7 @@ class LoRaController:
                 logging.info(f"Received new message with RSSI {rssi}")
                 start_idx = msg.find('{')
                 msg = msg[start_idx:].strip()
-                yield msg
+                return msg
             else:
                 logging.error("Error receiving message!")
 

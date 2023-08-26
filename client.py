@@ -31,11 +31,16 @@ def main():
                 time.sleep(2)
                 waiting = False
 
+            if time.time() - start_time > 10:
+                logging.warning("Timeout after waiting for 10 seconds.")
+                waiting = False
+
         payload = get_user_payload()
         if payload:
             try:
                 lora_controller.send_message(payload, 0x00)
                 waiting = True
+                start_time = time.time()
             except Exception as e:
                 logging.error(f"An unexpected error occurred: {e}")
 

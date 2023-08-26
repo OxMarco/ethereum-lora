@@ -36,7 +36,7 @@ def send_to_node(data):
     response = requests.post(url, data=data, headers=headers)
     response.raise_for_status()
 
-    return {"success": True, "data": response.json()}
+    return response.json()
 
 
 def main():

@@ -69,7 +69,7 @@ def main():
                 
         while True:
             if lora.available() > 0:
-                code, value, rssi = lora.receive_message(rssi=True, delimiter=b'\n')
+                code, msg, rssi = lora.receive_message(rssi=True, delimiter=b'\n')
                 print("Received a new message")
                 if code != 1:
                     print("Error!")
@@ -77,13 +77,13 @@ def main():
                 
                 print("RSSI", rssi)
                 try:
-                    data = json.loads(value.strip())
-                    data = json.dumps(data).replace("'", '"')
-                    print("message:", data)
+                    # remove eventual spurious chars
+                    start_idx = msg.find('{')
+                    msg = msg[start_idx:].strip()
                     
                     try:
                         print("Sending to node...")
-                        response = send_to_node(data)
+                        response = send_to_node(msg)
                         print("Response: ", json.dumps(response, indent=4))
                         #print("Responding...")
                         #code = lora.send_transparent_message(response)
@@ -91,14 +91,12 @@ def main():
                         #    print("Error!")
                         #print("OK")
                     except Exception as e:
-                        print(json.dumps({"success": False, "error": f"An unexpected error occurred: {e}"}, indent=4))
+                        print(f"An unexpected error occurred: {e}")
                         continue
                     finally:
                         time.sleep(2)
                 except json.JSONDecodeError as e:
-                    # Not a complete JSON message, keep reading
-                    print("Invalid JSON message received")
-                    print(e)
+                    print(f"Decoding error: {e}")
                     continue
     except requests.exceptions.RequestException as e:
         print(f"Connection error: {e}")

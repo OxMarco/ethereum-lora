@@ -6,7 +6,7 @@ from lora.lora_e22 import LoRaE22, Configuration
 from lora.lora_e22_operation_constant import ResponseStatusCode
 from lora.lora_e22_constants import FixedTransmission, RssiEnableByte
 
-from configure import configure, client_address
+from configure import configure, server_address, client_address, channel
 
 def main():
     lora_chip_model = os.environ.get('LORA_CHIP_MODEL', '400T33D')
@@ -24,23 +24,27 @@ def main():
         return
     
     configure(lora, lora_chip_model, client_address)
-    
-    configuration_to_set = Configuration(lora_chip_model)
-    # To enable RSSI, you must also enable RSSI on receiver
-    configuration_to_set.TRANSMISSION_MODE.enableRSSI = RssiEnableByte.RSSI_ENABLED
-    code, confSetted = lora.set_configuration(configuration_to_set)
 
-    if code != 1:
-        print("LoRa setup error!")
-        return
-    print("OK")
+    while True:
+        # Prompt the user to enter JSON payload
+        payload = input("\nPlease enter the JSON payload (or 'exit' to quit): ")
 
-    print("Sending message...")
-    payload = {"jsonrpc": "2.0", "method": "eth_getBalance", "params": ["0x8D97689C9818892B700e27F316cc3E41e17fBeb9","latest"], "id": 1}
-    code = lora.send_fixed_message(0, 0x01, 23, json.dumps(payload)+'\n')
-    if code != 1:
-        print("Error!")
-    print("OK")
+        if payload.strip().lower() == 'exit':
+            break
+
+        # Validate the input to ensure it's a valid JSON
+        try:
+            json.loads(payload)
+
+            print("Sending message...")
+            code = lora.send_fixed_message(0, server_address, channel, json.dumps(payload)+'\n')
+            if code != 1:
+                print("Error!")
+            print("OK")
+
+        except json.JSONDecodeError:
+            print("Invalid JSON input, retry")
+        continue
 
 
 if __name__ == "__main__":

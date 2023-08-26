@@ -665,10 +665,8 @@ class LoRaE22:
         if data is None or len(data) == 0:
             return (ResponseStatusCode.ERR_E22_DATA_SIZE_NOT_MATCH, None, None) \
                 if rssi else (ResponseStatusCode.ERR_E22_DATA_SIZE_NOT_MATCH, None)
-        try:
-            data = data.decode('utf-8')
-        except UnicodeDecodeError:
-            data = data[1:].decode('utf-8')
+
+        data = data.decode('utf-8', errors='replace')
 
         msg = data
 

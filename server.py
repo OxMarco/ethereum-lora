@@ -1,10 +1,9 @@
 import time
 import json
-import requests
 import logging
 
 from config_manager import ConfigManager
-from lora_controller import LoRaController
+from lora_controller import LoRaController, MessageType
 from node_connector import NodeConnector
 
 logging.basicConfig(level=logging.INFO)
@@ -21,15 +20,23 @@ def main():
     while True:
         msg = lora_controller.listen()
         if msg:
-            try:
-                response = node.send(msg)
-                data = json.dumps(response, separators=(',', ':'))
-                logging.info(f"Data: {data}")
-                lora_controller.send_message(data, 0x01)
-            except Exception as e:
-                logging.error(f"An unexpected error occurred: {e}")
-            finally:
-                time.sleep(2)
+            type, addr = lora_controller.parse_message_type(msg)
+            # skip invalid messages
+            if not addr:
+                continue
+
+            # it is a handshake
+            if type == MessageType.HANDSHAKE_INIT.value:
+                lora_controller.reply_ping(addr)
+            # it is a normal message
+            else:
+                try:
+                    response = node.send(msg)
+                    data = json.dumps(response, separators=(',', ':'))
+                    logging.info(f"Data: {data}")
+                    lora_controller.send_message(data, addr)
+                except Exception as e:
+                    logging.error(f"An unexpected error occurred: {e}")
 
 if __name__ == "__main__":
     main()

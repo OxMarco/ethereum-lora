@@ -1,8 +1,14 @@
 import serial
 import logging
+import json
+from enum import Enum
 
 from lora.lora_e22 import LoRaE22, Configuration
 from lora.lora_e22_constants import FixedTransmission, RssiEnableByte, RssiAmbientNoiseEnable, RepeaterModeEnableByte, TransmissionPower33, AirDataRate, UARTParity, UARTBaudRate
+
+class MessageType(Enum):
+    HANDSHAKE_INIT = 1,
+    HANDSHAKE_REPLY = 2
 
 class LoRaController:
     def __init__(self, lora_chip_model, serial_port, aux_pin, m0_pin, m1_pin, address, channel, delimiter='\n'):
@@ -56,9 +62,43 @@ class LoRaController:
                 logging.error("Error receiving message!")
 
     def send_message(self, payload, destination_address):
+        data = json.loads(payload)
+        data["from"] = self.address
+        payload = json.dumps(data, separators=(',', ':')) + self.delimiter
+
         logging.info("Sending message...")
-        code = self.lora.send_fixed_message(0, destination_address, self.channel, payload + self.delimiter)
+        code = self.lora.send_fixed_message(0, destination_address, self.channel, payload)
         if code != 1:
             logging.error("Error sending message!")
             raise Exception("Error sending message")
         logging.info("OK")
+
+    def send_ping(self):
+        logging.info("Sending broadcast ping...")
+        message = json.loads(f'{"message_type": {MessageType.HANDSHAKE_INIT.value}, "address": self.address}\n')
+        code = self.lora.send_transparent_message(message)
+        if code != 1:
+            logging.error("Error sending broadcast ping!")
+            raise Exception("Error sending broadcast ping")
+        logging.info("OK")
+
+    def reply_ping(self, address):
+        logging.info("Replying to ping...")
+        message = json.loads(f'{"message_type": {MessageType.HANDSHAKE_REPLY.value}, "address": self.address}\n')
+        self.send_message(message, address)
+
+    def parse_message_type(self, message) -> (str, str):
+        try:
+            parsed_msg = json.loads(message)
+            message_type = parsed_msg.get('message_type')
+            address = parsed_msg.get("from")
+            if not address:
+                return ("", "")
+            if not message_type:
+                return ("", address)
+            else:
+                return (message_type, address)
+
+        except json.JSONDecodeError as e:
+            logging.error(f"Failed to parse the message: {e}")
+            return ("", "")

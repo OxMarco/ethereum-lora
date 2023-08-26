@@ -20,7 +20,7 @@ def test_connection():
         "params": [],
         "id": 1,
     }
-    response = send_to_node(json.dumps(payload))
+    response = send_to_node(json.dumps(payload), separators=(',', ':'))
     if response != "":
         print("\nConnection successful!")
         print("Client Version:", response["result"])
@@ -82,8 +82,8 @@ def main():
                     try:
                         print("Sending to node...")
                         response = send_to_node(msg)
-                        data = json.dumps(response, indent=4)
-                        print("Response: ", data)
+                        data = json.dumps(response, separators=(',', ':'))
+                        print("Data: ", data)
                         print("Responding...")
                         code = lora.send_fixed_message(0, client_address, channel, data+'\n')
                         if code != 1:

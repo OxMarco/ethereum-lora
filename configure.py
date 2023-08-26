@@ -1,4 +1,4 @@
-from lora.lora_e22 import LoRaE22, Configuration, print_configuration
+from lora.lora_e22 import LoRaE22, Configuration
 from lora.lora_e22_constants import FixedTransmission, RssiEnableByte, RssiAmbientNoiseEnable, RepeaterModeEnableByte, TransmissionPower33, AirDataRate, UARTParity, UARTBaudRate
 
 server_address = 0x00

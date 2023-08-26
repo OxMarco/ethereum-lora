@@ -363,6 +363,8 @@ class LoRaE22:
     # now the constructor that receive directly the UART object
     def __init__(self, model, uart, aux_pin=None, m0_pin=None, m1_pin=None,
                  gpio_mode=GPIO.BCM):
+        GPIO.setwarnings(False)
+
         self.uart = uart
         self.model = model
 

@@ -18,9 +18,9 @@ def configure(lora: LoRaE22, chipset: str, address) -> bool:
     configuration_to_set.CHAN = channel
 
     code, confSetted = lora.set_configuration(configuration_to_set)
-    if code == 0:
-        print("Configuration setted")
+    if code != 1:
+        print("Configuration error")
         return False
     else:
-        print("Error setting configuration")
+        print("Configuration correctly set")
         return True

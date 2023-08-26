@@ -21,22 +21,25 @@ def test_connection():
         "id": 1,
     }
     response = send_to_node(json.dumps(payload))
-    if response["success"]:
+    if response != "":
         print("\nConnection successful!")
-        print("Client Version:", response["data"]["result"])
+        print("Client Version:", response["result"])
     else:
-        print("\nConnection failed! Please ensure your Geth node is running and accessible.")
-        print("Error:", response["error"])
+        print("\nConnection failed! Please ensure your node is running and accessible.")
         exit(1)
 
 
 def send_to_node(data):
-    url = os.environ.get('NODE_URL', 'http://127.0.0.1:8545')
-    headers = {'Content-type': 'application/json'}
-    response = requests.post(url, data=data, headers=headers)
-    response.raise_for_status()
+    try:
+        url = os.environ.get('NODE_URL', 'http://127.0.0.1:8545')
+        headers = {'Content-type': 'application/json'}
+        response = requests.post(url, data=data, headers=headers)
+        response.raise_for_status()
 
-    return response.json()
+        return response.json()
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+        return ""
 
 
 def main():

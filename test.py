@@ -37,7 +37,7 @@ def main():
             json.loads(payload)
 
             print("Sending message...")
-            code = lora.send_fixed_message(0, server_address, channel, json.dumps(payload)+'\n')
+            code = lora.send_fixed_message(0, server_address, channel, payload+'\n')
             if code != 1:
                 print("Error!")
             print("OK")

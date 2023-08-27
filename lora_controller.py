@@ -74,8 +74,8 @@ class LoRaController:
 
     def send_ping(self):
         logging.info("Sending broadcast ping...")
-        message = json.dumps({"message_type": HANDSHAKE_INIT, "address": self.address})
-        code = self.lora.send_transparent_message(message)
+        message = json.dumps({"message_type": HANDSHAKE_INIT, "from": self.address}) + self.delimiter
+        code = self.lora.send_transparent_message("{\"a\": 1}\n")
         if code != 1:
             logging.error("Error sending broadcast ping!")
             raise Exception("Error sending broadcast ping")
@@ -83,11 +83,10 @@ class LoRaController:
 
     def reply_ping(self, address):
         logging.info("Replying to ping...")
-        message = json.dumps({"message_type": HANDSHAKE_REPLY, "address": self.address})
+        message = json.dumps({"message_type": HANDSHAKE_REPLY})
         self.send_message(message, address)
 
     def parse_message_type(self, message) -> (str, str):
-        print("messagesss", message)
         try:
             parsed_msg = json.loads(message)
             message_type = parsed_msg.get('message_type')

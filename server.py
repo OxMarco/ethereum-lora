@@ -11,7 +11,7 @@ logging.basicConfig(level=logging.INFO)
 def main():
     node_url = ConfigManager.get_node_url()
     node = NodeConnector(node_url)
-    node.test_connection()
+    #node.test_connection()
 
     lora_config = ConfigManager.get_lora_config()
     lora_controller = LoRaController(**lora_config)
@@ -20,13 +20,13 @@ def main():
     while True:
         msg = lora_controller.listen()
         if msg:
-            type, addr = lora_controller.parse_message_type(msg)
+            msg_type, addr = lora_controller.parse_message_type(msg)
             # skip invalid messages
             if not addr:
                 continue
 
             # it is a handshake
-            if type == HANDSHAKE_INIT:
+            if msg_type == HANDSHAKE_INIT:
                 lora_controller.reply_ping(addr)
             # it is a normal message
             else:

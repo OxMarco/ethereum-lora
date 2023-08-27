@@ -677,13 +677,18 @@ class LoRaE22:
     def clean_UART_buffer(self):
         self.uart.read_all()
 
-    def _read_until(self, terminator=b'\n') -> bytes:
+    def _read_until(self, terminator=b'\n', timeout=10) -> bytes:
         line = b''
+        start = time.time()
         while True:
             c = self.uart.read(1)
             line += c
             if c == terminator:
                 break
+            if time.time() - start_time > timeout:
+                logger.warning("Message reading timeout")
+                break
+
         return line
 
     def send_broadcast_message(self, CHAN, message) -> ResponseStatusCode:

@@ -25,14 +25,20 @@ def main():
     waiting = False
 
     # get server address
+    start_time = time.time()
     lora_controller.send_ping()
     while True:
         msg = lora_controller.listen()
         if msg:
-            type, addr = lora_controller.parse_message_type(msg)
-            if addr and type == HANDSHAKE_REPLY:
+            msg_type, addr = lora_controller.parse_message_type(msg)
+            if addr and msg_type == HANDSHAKE_REPLY:
                 server_address = addr
                 break
+
+        # send a ping every 10 seconds until connected
+        if time.time() - start_time > 10:
+            lora_controller.send_ping()
+            start_time = time.time()
     logging.info("Server address acquired")
 
     # start main loop

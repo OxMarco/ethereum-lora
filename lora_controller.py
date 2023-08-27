@@ -75,7 +75,7 @@ class LoRaController:
     def send_ping(self):
         logging.info("Sending broadcast ping...")
         message = json.dumps({"message_type": HANDSHAKE_INIT, "from": self.address}) + self.delimiter
-        code = self.lora.send_transparent_message("{\"a\": 1}\n")
+        code = self.lora.send_broadcast_message(self.channel, message)
         if code != 1:
             logging.error("Error sending broadcast ping!")
             raise Exception("Error sending broadcast ping")

@@ -685,7 +685,7 @@ class LoRaE22:
             line += c
             if c == terminator:
                 break
-            if time.time() - start_time > timeout:
+            if time.time() - start > timeout:
                 logger.warning("Message reading timeout")
                 break
 

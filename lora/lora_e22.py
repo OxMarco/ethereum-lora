@@ -648,7 +648,7 @@ class LoRaE22:
         rssi_value = None
         if delimiter is not None:
             data = self._read_until(delimiter)
-            if rssi:
+            if data and rssi:
                 rssi_value = data[-1]  # last byte is rssi
                 data = data[:-1]  # remove rssi from data
         elif size is not None:

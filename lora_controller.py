@@ -77,14 +77,14 @@ class LoRaController:
         logging.info("OK")
 
     def send_ping(self):
+        logging.info("Handshake init")
         message = json.dumps({"message_type": HANDSHAKE_INIT})
         self.send_message(message, 0, True)
-        logging.info("Ping")
 
     def reply_ping(self, address):
+        logging.info("Handshake reply")
         message = json.dumps({"message_type": HANDSHAKE_REPLY})
         self.send_message(message, address)
-        logging.info("Pong")
 
     def parse_message_type(self, message) -> (str, str):
         try:

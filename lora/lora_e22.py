@@ -687,7 +687,7 @@ class LoRaE22:
                 break
             if time.time() - start > timeout:
                 logger.error("Message reading timeout")
-                break
+                return b''
 
         return line
 

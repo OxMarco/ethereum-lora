@@ -60,31 +60,31 @@ class LoRaController:
             else:
                 logging.error("Error receiving message!")
 
-    def send_message(self, payload, destination_address):
+    def send_message(self, payload, destination_address, broadcast=False):
         data = json.loads(payload)
         data["from"] = self.address
         payload = json.dumps(data, separators=(',', ':')) + self.delimiter
 
-        logging.info("Sending message...")
-        code = self.lora.send_fixed_message(0, destination_address, self.channel, payload)
+        if broadcast:
+            logging.info("Sending broadcast message...")
+            code = self.lora.send_broadcast_message(self.channel, payload)
+        else:
+            logging.info("Sending message...")
+            code = self.lora.send_fixed_message(0, destination_address, self.channel, payload)
         if code != 1:
             logging.error("Error sending message!")
             raise Exception("Error sending message")
         logging.info("OK")
 
     def send_ping(self):
-        logging.info("Sending broadcast ping...")
-        message = json.dumps({"message_type": HANDSHAKE_INIT, "from": self.address}) + self.delimiter
-        code = self.lora.send_broadcast_message(self.channel, message)
-        if code != 1:
-            logging.error("Error sending broadcast ping!")
-            raise Exception("Error sending broadcast ping")
-        logging.info("OK")
+        message = json.dumps({"message_type": HANDSHAKE_INIT})
+        self.send_message(message, 0, True)
+        logging.info("Ping")
 
     def reply_ping(self, address):
-        logging.info("Replying to ping...")
         message = json.dumps({"message_type": HANDSHAKE_REPLY})
         self.send_message(message, address)
+        logging.info("Pong")
 
     def parse_message_type(self, message) -> (str, str):
         try:

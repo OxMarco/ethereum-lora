@@ -15,7 +15,7 @@ class ConfigManager:
             "aux_pin": int(os.environ.get('AUX_PIN', 18)),
             "m0_pin": int(os.environ.get('M0_PIN', 23)),
             "m1_pin": int(os.environ.get('M1_PIN', 24)),
-            "address": int(os.environ.get('ADDRESS', 0x01)),
+            "address": int(os.environ.get('ADDRESS', 1)),
             "channel": int(os.environ.get('CHANNEL', 23)),
             "delimiter": os.environ.get('DELIMITER', '\n')
         }

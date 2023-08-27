@@ -6,9 +6,8 @@ from enum import Enum
 from lora.lora_e22 import LoRaE22, Configuration
 from lora.lora_e22_constants import FixedTransmission, RssiEnableByte, RssiAmbientNoiseEnable, RepeaterModeEnableByte, TransmissionPower33, AirDataRate, UARTParity, UARTBaudRate
 
-class MessageType(Enum):
-    HANDSHAKE_INIT = 1,
-    HANDSHAKE_REPLY = 2
+HANDSHAKE_INIT = 1
+HANDSHAKE_REPLY = 2
 
 class LoRaController:
     def __init__(self, lora_chip_model, serial_port, aux_pin, m0_pin, m1_pin, address, channel, delimiter='\n'):
@@ -75,7 +74,7 @@ class LoRaController:
 
     def send_ping(self):
         logging.info("Sending broadcast ping...")
-        message = json.dumps({"message_type": MessageType.HANDSHAKE_INIT.value, "address": self.address})
+        message = json.dumps({"message_type": HANDSHAKE_INIT, "address": self.address})
         code = self.lora.send_transparent_message(message)
         if code != 1:
             logging.error("Error sending broadcast ping!")
@@ -84,10 +83,11 @@ class LoRaController:
 
     def reply_ping(self, address):
         logging.info("Replying to ping...")
-        message = json.dumps({"message_type": MessageType.HANDSHAKE_REPLY.value, "address": self.address})
+        message = json.dumps({"message_type": HANDSHAKE_REPLY, "address": self.address})
         self.send_message(message, address)
 
     def parse_message_type(self, message) -> (str, str):
+        print("messagesss", message)
         try:
             parsed_msg = json.loads(message)
             message_type = parsed_msg.get('message_type')

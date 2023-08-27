@@ -3,7 +3,7 @@ import json
 import logging
 
 from config_manager import ConfigManager
-from lora_controller import LoRaController, MessageType
+from lora_controller import LoRaController, HANDSHAKE_REPLY
 
 logging.basicConfig(level=logging.INFO)
 
@@ -25,14 +25,14 @@ def main():
     waiting = False
 
     # get server address
-    logging.info("Send ping")
     lora_controller.send_ping()
     while True:
         msg = lora_controller.listen()
-        type, addr = lora_controller.parse_message_type(msg)
-        if addr and type == MessageType.HANDSHAKE_REPLY.value:
-            server_address = addr
-            break
+        if msg:
+            type, addr = lora_controller.parse_message_type(msg)
+            if addr and type == HANDSHAKE_REPLY:
+                server_address = addr
+                break
     logging.info("Server address acquired")
 
     # start main loop

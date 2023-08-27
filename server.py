@@ -3,7 +3,7 @@ import json
 import logging
 
 from config_manager import ConfigManager
-from lora_controller import LoRaController, MessageType
+from lora_controller import LoRaController, HANDSHAKE_INIT
 from node_connector import NodeConnector
 
 logging.basicConfig(level=logging.INFO)
@@ -26,7 +26,7 @@ def main():
                 continue
 
             # it is a handshake
-            if type == MessageType.HANDSHAKE_INIT.value:
+            if type == HANDSHAKE_INIT:
                 lora_controller.reply_ping(addr)
             # it is a normal message
             else:

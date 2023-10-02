@@ -53,3 +53,7 @@ We've designed a modular approach, with a main driver program that leverages two
    ```
    python server.py
    ```
+
+## Acknowledgements
+A big thanks goes to the Ethereum Foundation for sponsoring this project under their "Run a Node" program.
+

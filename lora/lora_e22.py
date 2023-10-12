@@ -58,19 +58,21 @@
 # THE SOFTWARE.
 #############################################################################################
 
-from lora_e22_constants import UARTParity, UARTBaudRate, TransmissionPower, FixedTransmission, AirDataRate, \
-    OperatingFrequency, LbtEnableByte, WorPeriod, RssiEnableByte, RssiAmbientNoiseEnable, SubPacketSetting
-from lora_e22_operation_constant import ResponseStatusCode, SerialUARTBaudRate, \
-    PacketLength, RegisterAddress
+from lora.lora_e22_constants import UARTParity, UARTBaudRate, TransmissionPower, FixedTransmission, AirDataRate, \
+    OperatingFrequency, LbtEnableByte, WorPeriod, RssiEnableByte, RssiAmbientNoiseEnable, SubPacketSetting, \
+    WorTransceiverControl, RepeaterModeEnableByte
+from lora.lora_e22_operation_constant import ResponseStatusCode, SerialUARTBaudRate, \
+    PacketLength, RegisterAddress, ModeType, ProgramCommand
 
 import re
 import time
 import json
-from RPi import GPIO
 
-from lora_e22_constants import WorTransceiverControl, RepeaterModeEnableByte
-from lora_e22_operation_constant import ModeType, ProgramCommand
-
+is_raspberry: bool = True 
+try:
+    from RPi import GPIO
+except ImportError:
+    is_raspberry = False
 
 class Logger:
     def __init__(self, enable_debug):
@@ -361,9 +363,11 @@ class ModuleInformation:
 
 class LoRaE22:
     # now the constructor that receive directly the UART object
-    def __init__(self, model, uart, aux_pin=None, m0_pin=None, m1_pin=None,
-                 gpio_mode=GPIO.BCM):
-        GPIO.setwarnings(False)
+    def __init__(self, model, uart, aux_pin=0, m0_pin=0, m1_pin=0,
+                 gpio_mode=None):
+        if is_raspberry:
+            gpio_mode=GPIO.BCM
+            GPIO.setwarnings(False)
 
         self.uart = uart
         self.model = model
@@ -392,15 +396,15 @@ class LoRaE22:
         self.uart.reset_input_buffer()
         self.uart.reset_output_buffer()
 
-        GPIO.setmode(self.gpio_mode)
-
-        if self.aux_pin is not None:
-            GPIO.setup(self.aux_pin, GPIO.IN)
-        if self.m0_pin is not None and self.m1_pin is not None:
-            GPIO.setup(self.m0_pin, GPIO.OUT)
-            GPIO.setup(self.m1_pin, GPIO.OUT)
-            GPIO.output(self.m0_pin, GPIO.HIGH)
-            GPIO.output(self.m1_pin, GPIO.HIGH)
+        if is_raspberry:
+            GPIO.setmode(self.gpio_mode)
+            if self.aux_pin is not 0:
+                GPIO.setup(self.aux_pin, GPIO.IN)
+            if self.m0_pin is not 0 and self.m1_pin is not 0:
+                GPIO.setup(self.m0_pin, GPIO.OUT)
+                GPIO.setup(self.m1_pin, GPIO.OUT)
+                GPIO.output(self.m0_pin, GPIO.HIGH)
+                GPIO.output(self.m1_pin, GPIO.HIGH)
 
         # self.uart.timeout(1000)
 
@@ -413,7 +417,7 @@ class LoRaE22:
     def set_mode(self, mode: ModeType) -> ResponseStatusCode:
         self.managed_delay(40)
 
-        if self.m0_pin is None and self.m1_pin is None:
+        if not is_raspberry or (self.m0_pin is None and self.m1_pin is None):
             logger.debug(
                 "The M0 and M1 pins are not set, which means that you are connecting the pins directly as you need!")
         else:
@@ -459,7 +463,7 @@ class LoRaE22:
         result = ResponseStatusCode.E22_SUCCESS
         t = round(time.time()*1000)
 
-        if self.aux_pin is not None:
+        if is_raspberry:
             while GPIO.input(self.aux_pin) == 0:
                 if round(time.time()*1000) - t > timeout:
                     result = ResponseStatusCode.ERR_E22_TIMEOUT
@@ -682,9 +686,9 @@ class LoRaE22:
         start = time.time()
         while True:
             c = self.uart.read(1)
-            line += c
             if c == terminator:
                 break
+            line += c
             if time.time() - start > timeout:
                 logger.error("Message reading timeout")
                 return b''
@@ -757,7 +761,8 @@ class LoRaE22:
             if self.uart is not None:
                 self.uart.close()
                 del self.uart
-                GPIO.cleanup()
+                if is_raspberry:
+                    GPIO.cleanup()
             return ResponseStatusCode.E22_SUCCESS
 
         except Exception as E:

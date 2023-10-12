@@ -25,13 +25,13 @@ from lora_e22_constants import FixedTransmission, RssiEnableByte
 
 # Initialize the LoRaE22 module
 loraSerial = serial.Serial('/dev/serial0') #, baudrate=9600, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE, bytesize=serial.EIGHTBITS)
-lora = LoRaE22('400T22D', loraSerial, aux_pin=18, m0_pin=23, m1_pin=24)
+lora = LoRaE22('400T33D', loraSerial, aux_pin=18, m0_pin=23, m1_pin=24)
 code = lora.begin()
 print("Initialization: {}", ResponseStatusCode.get_description(code))
 
 # Set the configuration to default values and print the updated configuration to the console
 # Not needed if already configured
-configuration_to_set = Configuration('400T22D')
+configuration_to_set = Configuration('400T33D')
 # Comment this section if you want test transparent trasmission
 configuration_to_set.ADDH = 0x00 # Address of this receive no sender
 configuration_to_set.ADDL = 0x01 # Address of this receive no sender

@@ -1,10 +1,10 @@
 import serial
 import logging
 import json
-from enum import Enum
 
-from lora.lora_e22 import LoRaE22, Configuration
+from lora.lora_e22 import LoRaE22, Configuration, print_configuration
 from lora.lora_e22_constants import FixedTransmission, RssiEnableByte, RssiAmbientNoiseEnable, RepeaterModeEnableByte, TransmissionPower33, AirDataRate, UARTParity, UARTBaudRate
+from lora.lora_e22_operation_constant import ResponseStatusCode
 
 HANDSHAKE_INIT = 1
 HANDSHAKE_REPLY = 2
@@ -46,7 +46,7 @@ class LoRaController:
         code, confSetted = self.lora.set_configuration(configuration_to_set)
         if code != 1:
             logging.error("Configuration error")
-            exit(1)
+            #exit(1)
         logging.info("OK")
 
     def listen(self):

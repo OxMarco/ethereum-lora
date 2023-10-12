@@ -1,4 +1,3 @@
-import time
 import json
 import logging
 
@@ -11,9 +10,10 @@ logging.basicConfig(level=logging.INFO)
 def main():
     node_url = ConfigManager.get_node_url()
     node = NodeConnector(node_url)
-    #node.test_connection()
+    node.test_connection()
 
     lora_config = ConfigManager.get_lora_config()
+    lora_config["serial_port"] = "/dev/tty.usbserial-110"
     lora_controller = LoRaController(**lora_config)
     lora_controller.setup()
 

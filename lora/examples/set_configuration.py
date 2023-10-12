@@ -21,7 +21,7 @@ import serial
 loraSerial = serial.Serial('/dev/serial0') #, baudrate=9600, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE, bytesize=serial.EIGHTBITS)
 
 # Create a LoRaE22 object, passing the UART object and pin configurations
-lora = LoRaE22('400T22D', loraSerial, aux_pin=18, m0_pin=23, m1_pin=24)
+lora = LoRaE22('400T33D', loraSerial, aux_pin=18, m0_pin=23, m1_pin=24)
 
 # Initialize the LoRa module and print the initialization status code
 code = lora.begin()
@@ -43,7 +43,7 @@ print_configuration(configuration)
 ##########################################################################################
 
 # Create a new Configuration object with the desired settings
-configuration_to_set = Configuration('400T22D')
+configuration_to_set = Configuration('400T33D')
 configuration_to_set.ADDL = 0x02
 configuration_to_set.ADDH = 0x01
 configuration_to_set.CHAN = 23
@@ -55,7 +55,7 @@ configuration_to_set.SPED.uartParity = UARTParity.MODE_00_8N1
 configuration_to_set.SPED.uartBaudRate = UARTBaudRate.BPS_9600
 
 configuration_to_set.OPTION.subPacketSetting = SubPacketSetting.SPS_064_10
-configuration_to_set.OPTION.transmissionPower = TransmissionPower('400T22D').\
+configuration_to_set.OPTION.transmissionPower = TransmissionPower('400T33D').\
                                                     get_transmission_power().POWER_10
 # or
 # configuration_to_set.OPTION.transmissionPower = TransmissionPower22.POWER_10
@@ -85,7 +85,7 @@ print_configuration(confSetted)
 
 # Set the configuration to default values and print the updated configuration to the console
 print("------------- RESTORE ALL DEFAULT -------------")
-configuration_to_set = Configuration('400T22D')
+configuration_to_set = Configuration('400T33D')
 code, confSetted = lora.set_configuration(configuration_to_set)
 print(ResponseStatusCode.get_description(code))
 print_configuration(confSetted)

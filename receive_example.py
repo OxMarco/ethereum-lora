@@ -18,14 +18,13 @@
 import serial
 import time
 
-from lora_e22 import LoRaE22, Configuration
-from lora_e22_operation_constant import ResponseStatusCode
-
-from lora_e22_constants import FixedTransmission, RssiEnableByte
+from lora.lora_e22 import LoRaE22, Configuration
+from lora.lora_e22_operation_constant import ResponseStatusCode
+from lora.lora_e22_constants import FixedTransmission, RssiEnableByte
 
 # Initialize the LoRaE22 module
-loraSerial = serial.Serial('/dev/serial0') #, baudrate=9600, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE, bytesize=serial.EIGHTBITS)
-lora = LoRaE22('400T33D', loraSerial, aux_pin=18, m0_pin=23, m1_pin=24)
+loraSerial = serial.Serial('/dev/tty.usbserial-110') #, baudrate=9600, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE, bytesize=serial.EIGHTBITS)
+lora = LoRaE22('400T33D', loraSerial, aux_pin=0, m0_pin=0, m1_pin=0)
 code = lora.begin()
 print("Initialization: {}", ResponseStatusCode.get_description(code))
 

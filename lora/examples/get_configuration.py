@@ -17,7 +17,7 @@ from lora_e22_operation_constant import ResponseStatusCode
 
 loraSerial = serial.Serial('/dev/serial0') #, baudrate=9600, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE, bytesize=serial.EIGHTBITS)
 
-lora = LoRaE22('400T22D', loraSerial, aux_pin=18, m0_pin=23, m1_pin=24)
+lora = LoRaE22('400T33D', loraSerial, aux_pin=18, m0_pin=23, m1_pin=24)
 
 code = lora.begin()
 print("Initialization: {}", ResponseStatusCode.get_description(code))

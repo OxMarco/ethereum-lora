@@ -18,6 +18,7 @@ def get_user_payload():
 
 def main():
     lora_config = ConfigManager.get_lora_config()
+    lora_config["serial_port"] = "/dev/tty.usbserial-210"
     lora_controller = LoRaController(**lora_config)
     lora_controller.setup()
 
